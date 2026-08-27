@@ -49,7 +49,7 @@ jobs:
           ALIAS: ${{ secrets.ALIAS }}
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: chmod +x gradlew && ./gradlew :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease
+        run: chmod +x gradlew && ./gradlew spotlessApply && ./gradlew :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease
 
       - name: Prepare release and store index
         id: prepare
