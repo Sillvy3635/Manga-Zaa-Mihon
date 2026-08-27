@@ -1,0 +1,103 @@
+name: Build and publish store
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manga-zaa-store
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate signing secrets
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$SIGNING_KEY" || { echo "Missing SIGNING_KEY secret"; exit 1; }
+          test -n "$ALIAS" || { echo "Missing ALIAS secret"; exit 1; }
+          test -n "$KEY_STORE_PASSWORD" || { echo "Missing KEY_STORE_PASSWORD secret"; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo "Missing KEY_PASSWORD secret"; exit 1; }
+          printf '%s' "$SIGNING_KEY" | base64 --decode > signingkey.jks
+
+      - name: Lint and build release APK
+        env:
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease
+
+      - name: Prepare release and store index
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=$(find src/th/mangazaa/build/outputs/apk/release -name '*.apk' -print -quit)
+          META=src/th/mangazaa/build/keiyoushi-source-info.json
+          test -n "$APK"
+          VERSION=$(python3 -c 'import json; print(json.load(open("src/th/mangazaa/build/keiyoushi-source-info.json"))["versionName"])')
+          TAG="v$VERSION"
+          APK_NAME=$(basename "$APK")
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          SIGNING_KEY=$($APKSIGNER verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          test -n "$SIGNING_KEY"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" --title "Manga-Zaa $VERSION" --generate-notes
+          fi
+
+          python3 -m pip install --disable-pip-version-check protobuf
+          python3 scripts/generate_repo.py \
+            --metadata "$META" \
+            --output /tmp/manga-zaa-store \
+            --repository "$GITHUB_REPOSITORY" \
+            --tag "$TAG" \
+            --apk-name "$APK_NAME" \
+            --signing-key "$SIGNING_KEY"
+          cp src/th/mangazaa/res/mipmap-xhdpi/ic_launcher.png /tmp/manga-zaa-store/icon.png
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Publish repo branch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git switch --orphan publish-repo
+          git rm -rf .
+          cp -a /tmp/manga-zaa-store/. .
+          printf '# Manga-Zaa Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/index.pb`\n' "$GITHUB_REPOSITORY" > README.md
+          git add index.pb index.json index.html icon.png README.md
+          git commit -m "Update extension store ${{ steps.prepare.outputs.tag }}"
+          git push --force origin HEAD:repo
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: manga-zaa-${{ steps.prepare.outputs.tag }}
+          path: src/th/mangazaa/build/outputs/apk/release/*.apk
+
