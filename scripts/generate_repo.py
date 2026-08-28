@@ -32,7 +32,7 @@ def main() -> None:
     extension = index_pb2.Extension(
         name=info["name"],
         packageName=info["packageName"],
-        resources=index_pb2.Resources(apkUrl=apk_url, iconUrl=icon_url),
+        resources=index_pb2.Resources(apkUrl=apk_url, iconUrl=icon_url, jarUrl=apk_url),
         extensionLib=info["extensionLib"],
         versionCode=info["versionCode"],
         versionName=info["versionName"],
