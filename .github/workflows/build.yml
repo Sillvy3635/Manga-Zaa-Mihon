@@ -91,7 +91,6 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git restore .
           git switch --orphan publish-repo
-          git rm -rf .
           cp -a /tmp/manga-zaa-store/. .
           printf '# Manga-Zaa Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/index.pb`\n' "$GITHUB_REPOSITORY" > README.md
           git add index.pb index.json index.html icon.png README.md
