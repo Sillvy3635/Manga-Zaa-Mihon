@@ -26,6 +26,10 @@ def main() -> None:
         f"https://github.com/{args.repository}/releases/download/"
         f"{args.tag}/{args.apk_name}"
     )
+    jar_url = (
+        f"https://github.com/{args.repository}/releases/download/"
+        f"{args.tag}/{args.jar_name}"
+    )
     icon_url = (
         f"https://raw.githubusercontent.com/{args.repository}/repo/icon.png"
     )
