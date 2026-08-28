@@ -11,6 +11,9 @@ import org.jsoup.nodes.Element
 @Source
 abstract class BkkManga : MadaraNoAjax() {
 
+    override fun chapterListSelector() =
+        ".listing-chapters_wrap ul.sub-chap > li, .listing-chapters_wrap ul.list-chap > li"
+
     override fun parseArchive(document: Document): List<SManga> = document.select(archiveSelector()).mapNotNull { element ->
         val link = element.selectFirst(archiveUrlSelector) ?: return@mapNotNull null
         val href = link.attr("abs:href").takeIf(String::isNotBlank) ?: return@mapNotNull null
