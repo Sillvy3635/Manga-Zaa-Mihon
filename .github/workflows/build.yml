@@ -78,7 +78,7 @@ jobs:
           keytool -exportcert -alias "$ALIAS" -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -file /tmp/mangazaa-cert.der
           SIGNING_KEY=$(openssl x509 -inform DER -in /tmp/mangazaa-cert.der -noout -fingerprint -sha256 | cut -d= -f2)
           test -n "$SIGNING_KEY"
-
+          
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "${ASSETS[@]}" --clobber
           else
