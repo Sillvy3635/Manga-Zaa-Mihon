@@ -54,7 +54,9 @@ jobs:
       - name: Prepare release and store index
         id: prepare
         env:
-          GH_TOKEN: ${{ github.token }}
+            GH_TOKEN: ${{ github.token }}
+            ALIAS: ${{ secrets.ALIAS }}
+            KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
           APK=$(find src/th/mangazaa/build/outputs/jar/release -name '*.jar' -print -quit)
           META=src/th/mangazaa/build/keiyoushi-source-info.json
@@ -62,8 +64,8 @@ jobs:
           VERSION=$(python3 -c 'import json; print(json.load(open("src/th/mangazaa/build/keiyoushi-source-info.json"))["versionName"])')
           TAG="v$VERSION"
           APK_NAME=$(basename "$APK")
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
-          SIGNING_KEY=$($APKSIGNER verify --min-sdk-version 26 --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          keytool -exportcert -alias "$ALIAS" -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -file /tmp/mangazaa-cert.der
+          SIGNING_KEY=$(openssl x509 -inform DER -in /tmp/mangazaa-cert.der -noout -fingerprint -sha256 | cut -d= -f2)
           test -n "$SIGNING_KEY"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
