@@ -15,6 +15,7 @@ def main() -> None:
     parser.add_argument("--repository", required=True)
     parser.add_argument("--tag", required=True)
     parser.add_argument("--apk-name", required=True)
+    parser.add_argument("--jar-name", required=True)
     parser.add_argument("--signing-key", required=True)
     args = parser.parse_args()
 
@@ -32,7 +33,7 @@ def main() -> None:
     extension = index_pb2.Extension(
         name=info["name"],
         packageName=info["packageName"],
-        resources=index_pb2.Resources(apkUrl=apk_url, iconUrl=icon_url, jarUrl=apk_url),
+        resources=index_pb2.Resources(apkUrl=apk_url, iconUrl=icon_url, jarUrl=jar_url),
         extensionLib=info["extensionLib"],
         versionCode=info["versionCode"],
         versionName=info["versionName"],
