@@ -1,18 +1,18 @@
 package eu.kanade.tachiyomi.extension.th.bkkmanga
 
 import eu.kanade.tachiyomi.multisrc.madara.MadaraNoAjax
+import eu.kanade.tachiyomi.multisrc.madara.MadaraBase
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import keiyoushi.annotation.Source
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 
 @Source
 abstract class BkkManga : MadaraNoAjax() {
 
-    override fun chapterListSelector() =
-        ".listing-chapters_wrap ul.sub-chap > li, .listing-chapters_wrap ul.list-chap > li"
+    override val chapterMode = MadaraBase.ChapterMode.AdminAjax
 
     override fun parseArchive(document: Document): List<SManga> = document.select(archiveSelector()).mapNotNull { element ->
         val link = element.selectFirst(archiveUrlSelector) ?: return@mapNotNull null
@@ -27,19 +27,24 @@ abstract class BkkManga : MadaraNoAjax() {
         }
     }
 
-    override fun chapterFromElement(element: Element, mangaPath: String): SChapter? {
-        val link = element.selectFirst(chapterUrlSelector) ?: return null
-        val href = link.attr("abs:href").takeIf(String::isNotBlank) ?: return null
+    override fun parseChapterList(document: Document, mangaPath: String): List<SChapter> {
+        val siteUrl = baseUrl.toHttpUrl()
+        val pathPrefix = siteUrl.resolve(mangaPath)?.encodedPath?.trimEnd('/')?.plus('/') ?: return emptyList()
 
-        return SChapter.create().apply {
-            url = href.toHttpUrl().encodedPath
-            name = link.text()
-            date_upload = parseChapterDate(
-                element.selectFirst("img:not(.thumb)")?.attr("alt")?.takeIf(String::isNotBlank)
-                    ?: element.selectFirst("span a")?.attr("title")?.takeIf(String::isNotBlank)
-                    ?: element.selectFirst(chapterDateSelector)?.text(),
-            )
-        }
+        return document.select("a[href]").mapNotNull { link ->
+            val chapterUrl = siteUrl.resolve(link.attr("href"))
+                ?: link.attr("href").toHttpUrlOrNull()
+                ?: return@mapNotNull null
+            val path = chapterUrl.encodedPath
+            if (chapterUrl.host != siteUrl.host || !path.startsWith(pathPrefix, ignoreCase = true)) {
+                return@mapNotNull null
+            }
+
+            SChapter.create().apply {
+                url = path
+                name = link.text()
+            }
+        }.distinctBy(SChapter::url)
     }
 
     override fun getChapterUrl(chapter: SChapter): String = baseUrl.toHttpUrl().resolve(chapter.url)?.toString()
