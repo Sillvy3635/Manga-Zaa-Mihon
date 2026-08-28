@@ -56,7 +56,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          APK=$(find src/th/mangazaa/build/outputs/apk/release -name '*.apk' -print -quit)
+          APK=$(find src/th/mangazaa/build/outputs/jar/release -name '*.jar' -print -quit)
           META=src/th/mangazaa/build/keiyoushi-source-info.json
           test -n "$APK"
           VERSION=$(python3 -c 'import json; print(json.load(open("src/th/mangazaa/build/keiyoushi-source-info.json"))["versionName"])')
@@ -99,5 +99,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: manga-zaa-${{ steps.prepare.outputs.tag }}
-          path: src/th/mangazaa/build/outputs/apk/release/*.apk
+          path: src/th/mangazaa/build/outputs/jar/release/*.jar
 
