@@ -1,6 +1,9 @@
-# Manga-Zaa Extension for Mihon
+# ส่วนขยายมังงะภาษาไทยสำหรับ Mihon
 
-ส่วนเสริมภาษาไทยสำหรับอ่านเนื้อหาจาก [Manga-Zaa](https://manga-zaa.net/) บน Mihon และแอปที่รองรับ TachiyomiX extension library 1.6
+Extension Store ส่วนตัวสำหรับ Mihon และแอปที่รองรับ TachiyomiX extension library 1.6 ปัจจุบันมี:
+
+- [Manga-Zaa](https://manga-zaa.net/)
+- [BKK Manga](https://bkkmanga.com/)
 
 ## ความสามารถ
 
@@ -16,10 +19,12 @@
 ต้องใช้ JDK 17 และ Android SDK:
 
 ```bash
-./gradlew :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease
+./gradlew \
+  :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease \
+  :src:th:bkkmanga:lintRelease :src:th:bkkmanga:assembleRelease
 ```
 
-APK จะอยู่ใน `src/th/mangazaa/build/outputs/apk/release/`
+APK จะอยู่ใน `src/th/<ชื่อโมดูล>/build/outputs/apk/release/`
 
 ## เปิดใช้ Extension Store บน GitHub
 
@@ -57,11 +62,10 @@ APK จะอยู่ใน `src/th/mangazaa/build/outputs/apk/release/`
    https://raw.githubusercontent.com/USERNAME/REPOSITORY/repo/index.pb
    ```
 
-ทุกครั้งที่แก้โค้ดสำหรับผู้ใช้ ให้เพิ่ม `versionCode` ใน `src/th/mangazaa/build.gradle.kts` ก่อน push มิฉะนั้น Mihon จะไม่เห็นเป็นอัปเดตใหม่
+ทุกครั้งที่แก้โค้ดของส่วนขยาย ให้เพิ่ม `versionCode` ใน `src/th/<ชื่อโมดูล>/build.gradle.kts` ก่อน push มิฉะนั้น Mihon จะไม่เห็นเป็นอัปเดตใหม่
 
 > เก็บ `signingkey.jks` และรหัสผ่านไว้เป็นความลับและสำรองไว้อย่างปลอดภัย หากกุญแจสูญหาย จะออกอัปเดตทับ Extension เดิมไม่ได้
 
 ## ข้อจำกัดความรับผิดชอบ
 
-โปรเจกต์นี้ไม่มีความเกี่ยวข้องกับ Mihon หรือ Manga-Zaa ผู้ใช้มีหน้าที่ปฏิบัติตามกฎหมายและเงื่อนไขของเว็บไซต์ที่เกี่ยวข้อง
-
+โปรเจกต์นี้ไม่มีความเกี่ยวข้องกับ Mihon หรือเว็บไซต์ต้นทาง ผู้ใช้มีหน้าที่ปฏิบัติตามกฎหมายและเงื่อนไขของเว็บไซต์ที่เกี่ยวข้อง

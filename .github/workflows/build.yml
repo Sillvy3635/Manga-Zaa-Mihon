@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: manga-zaa-store
+  group: sillvy-manga-store
   cancel-in-progress: true
 
 jobs:
@@ -49,55 +49,68 @@ jobs:
           ALIAS: ${{ secrets.ALIAS }}
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: chmod +x gradlew && ./gradlew spotlessApply && ./gradlew :src:th:mangazaa:lintRelease :src:th:mangazaa:assembleRelease
+        run: |
+          chmod +x gradlew
+          ./gradlew spotlessApply
+          ./gradlew \
+            :src:th:mangazaa:lintRelease \
+            :src:th:mangazaa:assembleRelease \
+            :src:th:bkkmanga:lintRelease \
+            :src:th:bkkmanga:assembleRelease
 
       - name: Prepare release and store index
         id: prepare
         env:
           GH_TOKEN: ${{ github.token }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
-          APK=$(find src/th/mangazaa/build/outputs/jar/release -name '*.jar' -print -quit)
-          META=src/th/mangazaa/build/keiyoushi-source-info.json
-          test -n "$APK"
-          VERSION=$(python3 -c 'import json; print(json.load(open("src/th/mangazaa/build/keiyoushi-source-info.json"))["versionName"])')
-          TAG="v$VERSION"
-          APK_NAME=$(basename "$APK")
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
-          SIGNING_KEY=$($APKSIGNER verify --min-sdk-version 26 --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          TAG="extensions"
+          ASSETS=()
+          for MODULE in mangazaa bkkmanga; do
+            APK=$(find "src/th/$MODULE/build" -type f -name '*.apk' -print -quit)
+            JAR=$(find "src/th/$MODULE/build/outputs/jar/release" -type f -name '*.jar' -print -quit)
+            test -n "$APK" || { echo "Missing APK for $MODULE"; exit 1; }
+            test -n "$JAR" || { echo "Missing JAR for $MODULE"; exit 1; }
+            ASSETS+=("$APK" "$JAR")
+          done
+
+          keytool -exportcert -alias "$ALIAS" -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -file /tmp/mangazaa-cert.der
+          SIGNING_KEY=$(openssl x509 -inform DER -in /tmp/mangazaa-cert.der -noout -fingerprint -sha256 | cut -d= -f2)
           test -n "$SIGNING_KEY"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" --clobber
+            gh release upload "$TAG" "${ASSETS[@]}" --clobber
           else
-            gh release create "$TAG" "$APK" --title "Manga-Zaa $VERSION" --generate-notes
+            gh release create "$TAG" "${ASSETS[@]}" --title "Sillvy Manga Extensions" --generate-notes
           fi
 
           python3 -m pip install --disable-pip-version-check protobuf
           python3 scripts/generate_repo.py \
-            --metadata "$META" \
+            --module-dir src/th/mangazaa \
+            --module-dir src/th/bkkmanga \
             --output /tmp/manga-zaa-store \
             --repository "$GITHUB_REPOSITORY" \
             --tag "$TAG" \
-            --apk-name "$APK_NAME" \
             --signing-key "$SIGNING_KEY"
-          cp src/th/mangazaa/res/mipmap-xhdpi/ic_launcher.png /tmp/manga-zaa-store/icon.png
           printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Publish repo branch
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git restore .
           git switch --orphan publish-repo
-          git rm -rf .
           cp -a /tmp/manga-zaa-store/. .
-          printf '# Manga-Zaa Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/index.pb`\n' "$GITHUB_REPOSITORY" > README.md
-          git add index.pb index.json index.html icon.png README.md
+          printf '# Sillvy Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/index.pb`\n' "$GITHUB_REPOSITORY" > README.md
+          git add index.pb index.json index.html icons README.md
           git commit -m "Update extension store ${{ steps.prepare.outputs.tag }}"
           git push --force origin HEAD:repo
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: manga-zaa-${{ steps.prepare.outputs.tag }}
-          path: src/th/mangazaa/build/outputs/jar/release/*.jar
-
+          name: sillvy-manga-${{ steps.prepare.outputs.tag }}
+          path: |
+            src/th/*/build/**/*.apk
+            src/th/*/build/outputs/jar/release/*.jar
