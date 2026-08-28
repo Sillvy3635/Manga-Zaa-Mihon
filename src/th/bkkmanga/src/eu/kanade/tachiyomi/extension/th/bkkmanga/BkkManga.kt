@@ -12,7 +12,7 @@ import org.jsoup.nodes.Document
 @Source
 abstract class BkkManga : MadaraNoAjax() {
 
-    override val chapterMode = MadaraBase.ChapterMode.AdminAjax
+    override val chapterMode = MadaraBase.ChapterMode.MangaAjax
 
     override fun parseArchive(document: Document): List<SManga> = document.select(archiveSelector()).mapNotNull { element ->
         val link = element.selectFirst(archiveUrlSelector) ?: return@mapNotNull null
