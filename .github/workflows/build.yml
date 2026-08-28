@@ -63,7 +63,7 @@ jobs:
           TAG="v$VERSION"
           APK_NAME=$(basename "$APK")
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
-          SIGNING_KEY=$($APKSIGNER verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          SIGNING_KEY=$($APKSIGNER verify --min-sdk-version 26 --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
           test -n "$SIGNING_KEY"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
