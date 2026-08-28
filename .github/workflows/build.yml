@@ -58,20 +58,23 @@ jobs:
             ALIAS: ${{ secrets.ALIAS }}
             KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
-          APK=$(find src/th/mangazaa/build/outputs/jar/release -name '*.jar' -print -quit)
+          APK=$(find src/th/mangazaa/build -type f -name '*.apk' -print -quit)
+          JAR=$(find src/th/mangazaa/build/outputs/jar/release -type f -name '*.jar' -print -quit)
           META=src/th/mangazaa/build/keiyoushi-source-info.json
           test -n "$APK"
+          test -n "$JAR"
           VERSION=$(python3 -c 'import json; print(json.load(open("src/th/mangazaa/build/keiyoushi-source-info.json"))["versionName"])')
           TAG="v$VERSION"
           APK_NAME=$(basename "$APK")
+          JAR_NAME=$(basename "$JAR")
           keytool -exportcert -alias "$ALIAS" -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -file /tmp/mangazaa-cert.der
           SIGNING_KEY=$(openssl x509 -inform DER -in /tmp/mangazaa-cert.der -noout -fingerprint -sha256 | cut -d= -f2)
           test -n "$SIGNING_KEY"
-
+          
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" --clobber
+            gh release upload "$TAG" "$APK" "$JAR" --clobber
           else
-            gh release create "$TAG" "$APK" --title "Manga-Zaa $VERSION" --generate-notes
+            gh release create "$TAG" "$APK" "$JAR" --title "Manga-Zaa $VERSION" --generate-notes
           fi
 
           python3 -m pip install --disable-pip-version-check protobuf
@@ -81,6 +84,7 @@ jobs:
             --repository "$GITHUB_REPOSITORY" \
             --tag "$TAG" \
             --apk-name "$APK_NAME" \
+            --jar-name "$JAR_NAME" \
             --signing-key "$SIGNING_KEY"
           cp src/th/mangazaa/res/mipmap-xhdpi/ic_launcher.png /tmp/manga-zaa-store/icon.png
           printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
@@ -101,5 +105,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: manga-zaa-${{ steps.prepare.outputs.tag }}
-          path: src/th/mangazaa/build/outputs/jar/release/*.jar
+          path: |
+            src/th/mangazaa/build/**/*.apk
+            src/th/mangazaa/build/outputs/jar/release/*.jar
 
