@@ -56,7 +56,9 @@ jobs:
             :src:th:mangazaa:lintRelease \
             :src:th:mangazaa:assembleRelease \
             :src:th:bkkmanga:lintRelease \
-            :src:th:bkkmanga:assembleRelease
+            :src:th:bkkmanga:assembleRelease \
+            :src:th:mangasuper:lintRelease \
+            :src:th:mangasuper:assembleRelease
 
       - name: Prepare release and store index
         id: prepare
@@ -67,7 +69,7 @@ jobs:
         run: |
           TAG="extensions"
           ASSETS=()
-          for MODULE in mangazaa bkkmanga; do
+          for MODULE in mangazaa bkkmanga mangasuper; do
             APK=$(find "src/th/$MODULE/build" -type f -name '*.apk' -print -quit)
             JAR=$(find "src/th/$MODULE/build/outputs/jar/release" -type f -name '*.jar' -print -quit)
             test -n "$APK" || { echo "Missing APK for $MODULE"; exit 1; }
@@ -89,6 +91,7 @@ jobs:
           python3 scripts/generate_repo.py \
             --module-dir src/th/mangazaa \
             --module-dir src/th/bkkmanga \
+            --module-dir src/th/mangasuper \
             --output /tmp/manga-zaa-store \
             --repository "$GITHUB_REPOSITORY" \
             --tag "$TAG" \

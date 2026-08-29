@@ -4,6 +4,7 @@ Extension Store ส่วนตัวสำหรับ Mihon และแอป
 
 - [Manga-Zaa](https://manga-zaa.net/)
 - [BKK Manga](https://bkkmanga.com/)
+- [MangaSuper](https://mangasuper.com/)
 
 ## ความสามารถ
 
