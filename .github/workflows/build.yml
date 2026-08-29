@@ -105,8 +105,8 @@ jobs:
           git restore .
           git switch --orphan publish-repo
           cp -a /tmp/manga-zaa-store/. .
-          printf '# Sillvy Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/index.pb`\n' "$GITHUB_REPOSITORY" > README.md
-          git add index.pb index.json index.html icons README.md
+          printf '# Sillvy Mihon Extension Store\n\nAdd this URL in Mihon:\n\n`https://raw.githubusercontent.com/%s/repo/repo.json`\n' "$GITHUB_REPOSITORY" > README.md
+          git add repo.json index.pb index.json index.html icons README.md
           git commit -m "Update extension store ${{ steps.prepare.outputs.tag }}"
           git push --force origin HEAD:repo
 

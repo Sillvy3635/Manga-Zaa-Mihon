@@ -60,7 +60,7 @@ APK จะอยู่ใน `src/th/<ชื่อโมดูล>/build/outputs
 5. ใน Mihon ไปที่ `More → Settings → Browse → Extension stores` แล้วเพิ่ม:
 
    ```text
-   https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/index.pb
+   https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/repo.json
    ```
 
 ทุกครั้งที่แก้โค้ดของส่วนขยาย ให้เพิ่ม `versionCode` ใน `src/th/<ชื่อโมดูล>/build.gradle.kts` ก่อน push มิฉะนั้น Mihon จะไม่เห็นเป็นอัปเดตใหม่

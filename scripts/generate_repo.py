@@ -87,6 +87,18 @@ def main() -> None:
         gzip.compress(index.SerializeToString(deterministic=True), mtime=0)
     )
 
+    repo_descriptor = {
+        "index_v2": f"https://raw.githubusercontent.com/{args.repository}/repo/index.pb",
+        "meta": {
+            "name": "Sillvy Manga Extensions",
+            "website": f"https://github.com/{args.repository}",
+            "signingKeyFingerprint": args.signing_key.lower().replace(":", ""),
+        },
+    }
+    (args.output / "repo.json").write_text(
+        json.dumps(repo_descriptor, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     index_html = (
         "<!doctype html>\n<html><head><meta charset=\"utf-8\">"
         "<title>Sillvy Manga Extensions</title></head><body><pre>"
