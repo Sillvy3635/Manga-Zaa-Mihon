@@ -1,0 +1,96 @@
+{
+  "name": "Sillvy Manga Extensions",
+  "badgeLabel": "SM",
+  "signingKey": "dbc57a905a18a38f1435fa280d452e5877017961ec9cdaea82dfbe573bb48c54",
+  "contact": {
+    "website": "https://github.com/Sillvy3635/Manga-Zaa-Mihon"
+  },
+  "extensionList": {
+    "extensions": [
+      {
+        "name": "1668Manga",
+        "packageName": "eu.kanade.tachiyomi.extension.th.manga1668",
+        "resources": {
+          "apkUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.manga1668-v1.6.56.apk",
+          "iconUrl": "https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/icons/eu.kanade.tachiyomi.extension.th.manga1668.png",
+          "jarUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.manga1668-v1.6.56.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "56",
+        "versionName": "1.6.56",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "3511888750873871322",
+            "name": "1668Manga",
+            "language": "th",
+            "homeUrl": "https://1668manga.com"
+          }
+        ]
+      },
+      {
+        "name": "BKK Manga",
+        "packageName": "eu.kanade.tachiyomi.extension.th.bkkmanga",
+        "resources": {
+          "apkUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.bkkmanga-v1.6.58.apk",
+          "iconUrl": "https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/icons/eu.kanade.tachiyomi.extension.th.bkkmanga.png",
+          "jarUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.bkkmanga-v1.6.58.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "58",
+        "versionName": "1.6.58",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "7557134806635682289",
+            "name": "BKK Manga",
+            "language": "th",
+            "homeUrl": "https://bkkmanga.com"
+          }
+        ]
+      },
+      {
+        "name": "Manga-Zaa",
+        "packageName": "eu.kanade.tachiyomi.extension.th.mangazaa",
+        "resources": {
+          "apkUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.mangazaa-v1.6.1.apk",
+          "iconUrl": "https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/icons/eu.kanade.tachiyomi.extension.th.mangazaa.png",
+          "jarUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.mangazaa-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "35396773425627555",
+            "name": "Manga-Zaa",
+            "language": "th",
+            "homeUrl": "https://manga-zaa.net"
+          }
+        ]
+      },
+      {
+        "name": "MangaSuper",
+        "packageName": "eu.kanade.tachiyomi.extension.th.mangasuper",
+        "resources": {
+          "apkUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.mangasuper-v1.6.55.apk",
+          "iconUrl": "https://raw.githubusercontent.com/Sillvy3635/Manga-Zaa-Mihon/repo/icons/eu.kanade.tachiyomi.extension.th.mangasuper.png",
+          "jarUrl": "https://github.com/Sillvy3635/Manga-Zaa-Mihon/releases/download/extensions/tachiyomi-th.mangasuper-v1.6.55.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "55",
+        "versionName": "1.6.55",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "7112244214971016458",
+            "name": "MangaSuper",
+            "language": "th",
+            "homeUrl": "https://mangasuper.com"
+          }
+        ]
+      }
+    ]
+  }
+}
