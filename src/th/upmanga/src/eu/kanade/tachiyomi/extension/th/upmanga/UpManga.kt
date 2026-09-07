@@ -20,12 +20,15 @@ import org.jsoup.nodes.Element
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
 
 @Source
 abstract class UpManga : KeiSource() {
 
-    protected override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = rateLimit(permits = 2, period = 1.seconds)
+    protected override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = readTimeout(60, TimeUnit.SECONDS)
+        .callTimeout(90, TimeUnit.SECONDS)
+        .rateLimit(permits = 2, period = 1.seconds)
 
     override suspend fun getPopularManga(page: Int): MangasPage = getMangaList(page, "popular")
 
