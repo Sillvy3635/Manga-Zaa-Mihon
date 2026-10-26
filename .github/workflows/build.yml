@@ -64,7 +64,9 @@ jobs:
             :src:th:upmanga:lintRelease \
             :src:th:upmanga:assembleRelease \
             :src:th:kkmanga:lintRelease \
-            :src:th:kkmanga:assembleRelease
+            :src:th:kkmanga:assembleRelease \
+            :src:th:whytoon:lintRelease \
+            :src:th:whytoon:assembleRelease
 
       - name: Prepare release and store index
         id: prepare
@@ -75,7 +77,7 @@ jobs:
         run: |
           TAG="extensions"
           ASSETS=()
-          for MODULE in mangazaa bkkmanga mangasuper manga1668 upmanga kkmanga; do
+          for MODULE in mangazaa bkkmanga mangasuper manga1668 upmanga kkmanga whytoon; do
             APK=$(find "src/th/$MODULE/build" -type f -name '*.apk' -print -quit)
             JAR=$(find "src/th/$MODULE/build/outputs/jar/release" -type f -name '*.jar' -print -quit)
             test -n "$APK" || { echo "Missing APK for $MODULE"; exit 1; }
@@ -101,6 +103,7 @@ jobs:
             --module-dir src/th/manga1668 \
             --module-dir src/th/upmanga \
             --module-dir src/th/kkmanga \
+            --module-dir src/th/whytoon \
             --output /tmp/manga-zaa-store \
             --repository "$GITHUB_REPOSITORY" \
             --tag "$TAG" \
