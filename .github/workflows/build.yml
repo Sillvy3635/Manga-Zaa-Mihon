@@ -28,6 +28,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -99,8 +104,8 @@ jobs:
             gh release create "$TAG" "${ASSETS[@]}" --title "Sillvy Manga Extensions" --generate-notes
           fi
 
-          python3 -m pip install --disable-pip-version-check protobuf
-          python3 scripts/generate_repo.py \
+          python -m pip install --disable-pip-version-check 'protobuf==7.35.1'
+          python scripts/generate_repo.py \
             --module-dir src/th/mangazaa \
             --module-dir src/th/bkkmanga \
             --module-dir src/th/mangasuper \
