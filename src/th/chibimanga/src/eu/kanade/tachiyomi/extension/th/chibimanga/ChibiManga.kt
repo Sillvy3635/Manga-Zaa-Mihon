@@ -142,6 +142,10 @@ abstract class ChibiManga : KeiSource() {
         }
     }
 
+    override fun imageRequest(page: Page) = super.imageRequest(page).newBuilder()
+        .header("Sec-Fetch-Dest", "image")
+        .build()
+
     private fun Document.infoValue(vararg labels: String): String? = select(".tsinfo .imptdt")
         .firstOrNull { row -> labels.any { it.equals(row.ownText(), ignoreCase = true) } }
         ?.selectFirst("i, a")
