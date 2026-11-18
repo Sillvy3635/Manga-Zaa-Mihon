@@ -89,9 +89,12 @@ abstract class Whytoon : KeiSource() {
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val document = client.get(getChapterUrl(chapter), headers).asJsoup()
         val imageData = document.html().substringAfter(IMAGES_MARKER, "").substringBefore(']')
-        val images = IMAGE_PATH.findAll(imageData).map { it.value }.distinct().toList()
+        val images = IMAGE_SOURCE.findAll(imageData).map { it.value }.distinct().toList()
         check(images.isNotEmpty()) { "Whytoon: ไม่พบรูปในตอน ${chapter.url}" }
-        return images.mapIndexed { index, path -> Page(index, imageUrl = "$IMAGE_CDN/$path") }
+        return images.mapIndexed { index, source ->
+            val imageUrl = if (source.startsWith("http")) source else "$IMAGE_CDN/$source"
+            Page(index, imageUrl = imageUrl)
+        }
     }
 
     companion object {
@@ -99,6 +102,6 @@ abstract class Whytoon : KeiSource() {
         private const val IMAGES_MARKER = "images\\\":["
         private const val IMAGE_CDN = "https://img.whytoon.com"
         private val EPISODE_NUMBER = Regex("""\\"no\\":([0-9.]+)""")
-        private val IMAGE_PATH = Regex("""content/[^"\\]+\.(?:webp|png|jpe?g)""", RegexOption.IGNORE_CASE)
+        private val IMAGE_SOURCE = Regex("""(?:https?://|content/)[^"\\]+\.(?:webp|png|jpe?g)""", RegexOption.IGNORE_CASE)
     }
 }
